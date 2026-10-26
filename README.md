@@ -1,32 +1,66 @@
-# Tourist Management System (TMS)
+# Voyager Tour OS
 
-A pure-frontend React (Vite) + Tailwind CSS + React Router prototype. There is no backend and no database:
-`src/api.js` simulates a REST API on top of `localStorage` (with artificial network latency).
+A premium **Tourist Management System** prototype. Pure frontend — no backend and no
+external services. All data lives in the browser's `localStorage`, written and read through a
+simulated API layer at `src/lib/api.ts`.
 
-## Frictionless demo login
-There are **no passwords**. The login page is a "Demo Portal":
-- Click one of the 4 profile cards (Admin, Manager, Guide, Tourist) to sign in instantly, or
-- type a username (`admin_user`, `manager_user`, `guide_user`, `tourist_user`) with no password.
+## Stack
 
-The session is stored in `localStorage`, and routes are protected by role.
-Demo data (users, 4 destinations, 4 packages, 3 bookings) is seeded on first load.
-Use "Reset demo data" on the login page to restore it.
+- React 19 + Vite 7 (TanStack Start v1)
+- Tailwind CSS v4 (`src/styles.css`)
+- shadcn/ui + Lucide React icons
+- Vitest for the seat-limit and routing checks
 
-## Run locally
-```bash
+## Run it
+
+```sh
 npm install
 npm run dev
 ```
 
-## Deploy to Vercel
-1. Push this folder to a GitHub repository.
-2. In Vercel: **Add New Project** -> import the repo (Framework preset: Vite).
-3. Deploy. HashRouter is used, so no rewrite rules are needed.
+Then open the URL the dev server prints (usually http://localhost:8080).
 
-## Roles
-- **Admin**: create users, destinations and packages.
-- **Tourist**: browse packages, book (seat validation), view itinerary, print an HTML invoice.
-- **Manager**: revenue, bookings, occupancy charts and all bookings.
-- **Guide**: bookings for packages assigned to them.
+To run the checks:
 
-> Demo only: data lives in the browser and there is intentionally no real authentication.
+```sh
+npm test
+```
+
+## Sign in
+
+No passwords. The sign-in screen lists four demo profiles — click one to enter:
+
+| Profile | Name | Sees |
+| --- | --- | --- |
+| Admin | Vishal Chauhan | Read-only tables of destinations and packages |
+| Manager | Ronak Singh | Revenue, bookings and seats-sold KPIs plus active tours |
+| Guide | Aditya Kumar Tiwari | Bookings assigned to the tours he leads |
+| Tourist | Yug Jain | Tour cards with a seat picker, Book button, invoices |
+
+Logging out uses the button beside your name at the bottom of the left menu.
+
+## Data
+
+On first load the app seeds 4 users, 4 destinations, 4 tour packages and 2 bookings into
+`localStorage`, then flags the browser as seeded (`tms_seeded_v3`). Bumping that flag in
+`src/lib/api.ts` forces a fresh reseed; clearing site data does the same.
+
+Because storage is per-browser, bookings you make stay after a refresh but are not visible to
+anyone else.
+
+## Layout
+
+```text
+src/
+  lib/api.ts          simulated API: seed data, users, packages, bookings, seat validation
+  routes/
+    index.tsx         sign-in with the four demo profiles
+    tourist.tsx       browse tours, book seats, view bookings
+    manager.tsx       KPI cards and active tours
+    guide.tsx         assigned bookings table
+    admin.tsx         destinations and packages tables
+    invoice.$id.tsx   printable booking invoice
+  components/
+    AppShell.tsx      sidebar, page header, reusable data table with empty states
+    ui/               shadcn/ui primitives
+```
